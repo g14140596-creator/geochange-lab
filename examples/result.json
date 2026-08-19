@@ -1,0 +1,49 @@
+{
+  "width": 640,
+  "height": 420,
+  "threshold": 0.075,
+  "changed_pixels": 13585,
+  "changed_ratio": 0.050539,
+  "alignment": {
+    "dx": 0,
+    "dy": 0,
+    "mae_before": 0.01466,
+    "mae_after": 0.01466
+  },
+  "regions": [
+    {
+      "id": 1,
+      "area_pixels": 10061,
+      "bbox": [
+        259,
+        189,
+        380,
+        282
+      ],
+      "centroid": [
+        319.18,
+        235.59
+      ],
+      "mean_score": 0.29,
+      "max_score": 0.3967,
+      "severity": "medium"
+    },
+    {
+      "id": 2,
+      "area_pixels": 3524,
+      "bbox": [
+        405,
+        191,
+        566,
+        309
+      ],
+      "centroid": [
+        510.56,
+        236.45
+      ],
+      "mean_score": 0.1162,
+      "max_score": 0.1296,
+      "severity": "low"
+    }
+  ]
+}
