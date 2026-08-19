@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "geochange-lab"
+version = "0.1.0"
+description = "Explainable geospatial change detection from paired satellite or aerial images"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Grace Huang" }]
+keywords = ["computer-vision", "remote-sensing", "change-detection", "geospatial", "explainable-ai"]
+dependencies = [
+  "numpy>=1.26",
+  "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.115", "uvicorn[standard]>=0.30", "python-multipart>=0.0.9"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+geochange = "geochangelab.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["geochangelab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
