@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from .models import AnalysisResult
 
@@ -42,4 +42,3 @@ def to_geojson(result: AnalysisResult, bounds: Iterable[float] | None = None) ->
             }
         )
     return {"type": "FeatureCollection", "features": features}
-

@@ -30,8 +30,8 @@ def home():
 
 @app.post("/api/analyze")
 async def analyze(
-    before: UploadFile = File(...),
-    after: UploadFile = File(...),
+    before: UploadFile = File(...),  # noqa: B008 - FastAPI dependency declaration
+    after: UploadFile = File(...),  # noqa: B008 - FastAPI dependency declaration
     sensitivity: float = Form(3.5),
     min_area: int = Form(24),
 ):
@@ -52,4 +52,3 @@ async def analyze(
         "geojson": to_geojson(result),
         "overlay_png_base64": base64.b64encode(output.getvalue()).decode("ascii"),
     }
-

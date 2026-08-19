@@ -33,11 +33,12 @@ def markdown_report(result: AnalysisResult) -> str:
             "",
             "## Interpretation notes",
             "",
-            "This is a screening tool, not an authoritative land-use decision system. "
-            "Clouds, seasonal vegetation, shadows, sensor differences, and imperfect "
-            "registration can create false positives. A human reviewer should inspect "
-            "each highlighted region and compare it with source metadata.",
+            (
+                "This is a screening tool, not an authoritative land-use decision system. "
+                "Clouds, seasonal vegetation, shadows, sensor differences, and imperfect "
+                "registration can create false positives. A human reviewer should inspect "
+                "each highlighted region and compare it with source metadata."
+            ),
         ]
     )
     return "\n".join(lines) + "\n"
-
