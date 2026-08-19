@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GeoChange Lab</title>
+  <style>
+    :root{--ink:#10231f;--muted:#63746f;--paper:#f5f7f2;--card:#fff;--green:#0e7a5f;--lime:#b9e769;--line:#dfe8e2;--red:#ff5c4d}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,sans-serif}
+    header{padding:28px 6vw;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:850;letter-spacing:-.03em}.pill{background:#dff6e9;color:#08654f;padding:7px 12px;border-radius:99px;font-size:13px;font-weight:700}
+    main{max-width:1160px;margin:auto;padding:30px 6vw 90px}.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:50px;align-items:center;padding:48px 0 60px}.eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--green);font-weight:800}h1{font-size:clamp(42px,6vw,78px);line-height:.98;letter-spacing:-.065em;margin:14px 0 24px}.lede{font-size:19px;color:var(--muted);max-width:660px}.metric{background:var(--ink);color:white;border-radius:28px;padding:28px;box-shadow:0 24px 50px #173c3020}.metric b{display:block;font-size:56px;color:var(--lime);letter-spacing:-.05em}.metric span{color:#c9d6d1}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 16px 40px #18362d10}.panel h2{margin-top:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.drop{border:1.5px dashed #9bb0a8;border-radius:16px;padding:24px;min-height:140px;display:flex;align-items:center;justify-content:center;text-align:center;background:#fbfcfa}.drop input{max-width:100%}.controls{display:flex;gap:18px;align-items:end;margin-top:20px;flex-wrap:wrap}.controls label{font-size:13px;font-weight:750;color:var(--muted)}input[type=range]{display:block;width:220px}.button{border:0;border-radius:12px;background:var(--green);color:white;padding:13px 20px;font-weight:800;cursor:pointer}.button:disabled{opacity:.5}.result{display:none;margin-top:28px;grid-template-columns:1.4fr .6fr;gap:20px}.result.show{display:grid}.result img{width:100%;border-radius:17px}.stats{display:grid;gap:12px}.stat{padding:18px;border:1px solid var(--line);border-radius:15px}.stat strong{display:block;font-size:27px}.how{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:50px}.step{padding:20px}.step b{color:var(--green)}footer{color:var(--muted);font-size:13px;margin-top:45px}@media(max-width:800px){.hero,.result{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.how{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <header><div class="brand">GeoChange Lab</div><div class="pill">Local-first · Explainable</div></header>
+  <main>
+    <section class="hero">
+      <div><div class="eyebrow">Computer vision for the changing Earth</div><h1>See what changed.<br>Understand why.</h1><p class="lede">Upload two aligned satellite or aerial images. GeoChange Lab registers them, scores meaningful differences, groups change regions, and exports evidence you can inspect—not a black-box prediction.</p></div>
+      <aside class="metric"><b>4</b><span>auditable stages: register, score, segment, explain</span></aside>
+    </section>
+    <section class="panel">
+      <h2>Analyze an image pair</h2><div class="grid"><label class="drop">Before image<br><input id="before" type="file" accept="image/*"></label><label class="drop">After image<br><input id="after" type="file" accept="image/*"></label></div>
+      <div class="controls"><label>Sensitivity <input id="sensitivity" type="range" min="2" max="6" step=".25" value="3.5"><span id="sv">3.5</span></label><label>Minimum region area <input id="area" type="number" min="4" value="24"></label><button class="button" id="run">Run analysis</button></div>
+      <div id="status" aria-live="polite"></div><div class="result" id="result"><img id="overlay" alt="Detected change overlay"><div class="stats"><div class="stat"><strong id="regions">—</strong>change regions</div><div class="stat"><strong id="ratio">—</strong>pixels changed</div><div class="stat"><strong id="offset">—</strong>registration offset</div></div></div>
+    </section>
+    <section class="how"><div class="panel step"><b>01</b><h3>Register</h3><p>Correct small camera or satellite offsets.</p></div><div class="panel step"><b>02</b><h3>Score</h3><p>Fuse color and structural edge differences.</p></div><div class="panel step"><b>03</b><h3>Segment</h3><p>Find coherent regions with an adaptive threshold.</p></div><div class="panel step"><b>04</b><h3>Explain</h3><p>Return boxes, confidence, severity and GeoJSON.</p></div></section>
+    <footer>Built by Grace Huang · Screening aid only—always review source imagery and metadata.</footer>
+  </main>
+  <script>
+    const sensitivity=document.querySelector('#sensitivity'),sv=document.querySelector('#sv');sensitivity.oninput=()=>sv.textContent=sensitivity.value;
+    document.querySelector('#run').onclick=async()=>{const before=document.querySelector('#before').files[0],after=document.querySelector('#after').files[0],status=document.querySelector('#status'),button=document.querySelector('#run');if(!before||!after){status.textContent='Choose both images first.';return}const data=new FormData();data.append('before',before);data.append('after',after);data.append('sensitivity',sensitivity.value);data.append('min_area',document.querySelector('#area').value);button.disabled=true;status.textContent='Analyzing…';try{const response=await fetch('/api/analyze',{method:'POST',body:data});const payload=await response.json();if(!response.ok)throw new Error(payload.detail||'Analysis failed');document.querySelector('#overlay').src='data:image/png;base64,'+payload.overlay_png_base64;document.querySelector('#regions').textContent=payload.analysis.regions.length;document.querySelector('#ratio').textContent=(payload.analysis.changed_ratio*100).toFixed(2)+'%';document.querySelector('#offset').textContent=`${payload.analysis.alignment.dx}, ${payload.analysis.alignment.dy}px`;document.querySelector('#result').classList.add('show');status.textContent='Analysis complete.'}catch(error){status.textContent=error.message}finally{button.disabled=false}};
+  </script>
+</body>
+</html>
